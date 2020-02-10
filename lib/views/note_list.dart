@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/models/note_for_listing.dart';
+import 'package:note_app/views/note_modify.dart';
 
 
 class NoteList extends StatelessWidget {
@@ -38,7 +39,7 @@ class NoteList extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-
+          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> NoteModify()));
         },
         child: Icon(Icons.add),
       ),
