@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:note_app/Service/notes_service.dart';
+import 'package:note_app/models/api_response.dart';
 import 'package:note_app/models/note_for_listing.dart';
 import 'package:note_app/views/note_delete.dart';
 import 'package:note_app/views/note_modify.dart';
@@ -15,18 +16,28 @@ class NoteList extends StatefulWidget {
 class _NoteListState extends State<NoteList> {
 
   NotesService get service => GetIt.instance<NotesService>();
-  List<NoteForListing> notes = [];
+  ApiResponse<List<NoteForListing>> apiResponse ;
+  bool isLoading ;
 
   @override
   void initState(){
-    notes = service.getNoteList();
+    _fetchNote();
     super.initState();
+  }
+
+  Future _fetchNote()  async{
+    setState(() {
+      isLoading = true ;
+    });
+    apiResponse = await service.getNoteList();
+    setState(() {
+      isLoading = false ;
+    });
   }
 
   String formatDateTime(DateTime dateTime){
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,42 +51,58 @@ class _NoteListState extends State<NoteList> {
         child: Icon(Icons.add),
       ),
 
-      body: ListView.separated(
-        itemCount: notes.length,
-        itemBuilder: (_,index){
-          return Dismissible(
-            key: ValueKey(notes[index].noteId),
-            direction: DismissDirection.startToEnd,
+      body:Builder(
+        builder:(_){
 
-            confirmDismiss: (direction) async{
-              final result = await showDialog(
-                  context: context,
-                  builder: (_) => NoteDelete());
-              return result;
-            },
-            onDismissed:(direction){
+          if(isLoading){
+            return Center(child: CircularProgressIndicator(),);
+          }
 
-            },
-            background: Container(
-              color: Colors.red,
-              padding: EdgeInsets.only(left: 16.0),
-              child: Align(child: Icon(Icons.delete,color: Colors.white,),alignment: Alignment.centerLeft,),
-            ),
+          if(apiResponse.error){
+            return Center(child: Text(apiResponse.errorMessage),);
+          }
 
-            child: ListTile(
-              title: Text(
-                notes[index].noteTitle,
-                style: TextStyle(color: Theme.of(context).primaryColorDark),
-              ),
-              subtitle: Text('Last edited on ${formatDateTime(notes[index].latestEditedDateTime)}'),
-              onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=>NoteModify(noteId: notes[index].noteId,) ));
+          return ListView.separated(
+              itemCount: apiResponse.data.length,
+              itemBuilder: (_,index){
+                return Dismissible(
+                  key: ValueKey(apiResponse.data[index].noteId),
+                  direction: DismissDirection.startToEnd,
+
+                  confirmDismiss: (direction) async{
+                    final result = await showDialog(
+                        context: context,
+                        builder: (_) => NoteDelete());
+                    return result;
+                  },
+                  onDismissed:(direction){
+
+                  },
+                  background: Container(
+                    color: Colors.red,
+                    padding: EdgeInsets.only(left: 16.0),
+                    child: Align(child: Icon(Icons.delete,color: Colors.white,),alignment: Alignment.centerLeft,),
+                  ),
+
+                  child: ListTile(
+                    title: Text(
+                      apiResponse.data[index].noteTitle,
+                      style: TextStyle(color: Theme.of(context).primaryColorDark),
+                    ),
+                    subtitle: Text('Last edited on ${formatDateTime(apiResponse.data[index].latestEditedDateTime ??
+                        apiResponse.data[index].createDateTime)}'),
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>NoteModify(noteId: apiResponse.data[index].noteId,) ));
+                    },
+                  ),
+                );
               },
-            ),
+              separatorBuilder: (_,__) => Divider(height: 2,color: Colors.blue,),
           );
-        },
-        separatorBuilder: (_,__) => Divider(height: 2,color: Colors.blue,),
-      ),
+        } ,
+      )
     );
   }
+
+
 }
