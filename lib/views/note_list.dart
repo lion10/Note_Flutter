@@ -66,7 +66,7 @@ class _NoteListState extends State<NoteList> {
               itemCount: apiResponse.data.length,
               itemBuilder: (_,index){
                 return Dismissible(
-                  key: ValueKey(apiResponse.data[index].noteId),
+                  key: ValueKey(apiResponse.data[index].noteID),
                   direction: DismissDirection.startToEnd,
 
                   confirmDismiss: (direction) async{
@@ -92,7 +92,7 @@ class _NoteListState extends State<NoteList> {
                     subtitle: Text('Last edited on ${formatDateTime(apiResponse.data[index].latestEditedDateTime ??
                         apiResponse.data[index].createDateTime)}'),
                     onTap: (){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>NoteModify(noteId: apiResponse.data[index].noteId,) ));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>NoteModify(noteId: apiResponse.data[index].noteID,) ));
                     },
                   ),
                 );

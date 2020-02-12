@@ -18,7 +18,7 @@ class NotesService{
               final notes = <NoteForListing>[];
                 for(var item in jsonData){
                   final note = NoteForListing(
-                      noteId: item['noteID'] ,
+                      noteID: item['noteID'] ,
                       noteTitle:item['noteTitle'],
                       createDateTime:DateTime.parse(item['createDateTime']) ,
                       latestEditedDateTime: item['latestEditDateTime'] != null ? DateTime.parse(item['latestEditDateTime']) : null);
