@@ -92,7 +92,7 @@ class _NoteListState extends State<NoteList> {
                     subtitle: Text('Last edited on ${formatDateTime(apiResponse.data[index].latestEditedDateTime ??
                         apiResponse.data[index].createDateTime)}'),
                     onTap: (){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>NoteModify(noteId: apiResponse.data[index].noteID,) ));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (_)=>NoteModify(noteID: apiResponse.data[index].noteID,) ));
                     },
                   ),
                 );
