@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:note_app/models/api_response.dart';
+import 'package:note_app/models/insert_note.dart';
 import 'package:note_app/models/note.dart';
 import 'package:note_app/models/note_for_listing.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,10 @@ import 'package:http/http.dart' as http;
 class NotesService{
 
   static const API  ='http://api.notes.programmingaddict.com';
-  static const Headers = {"apiKey": "08d7b05f-2d86-c601-e3ad-72b1a55e1baf"};
+  static const Headers = {
+    "apiKey": "08d7b098-cf67-a54e-c529-7018f7bf40d1",
+    "Content-Type" :"application/json"
+  };
 
 
   // for list of items
@@ -30,6 +34,7 @@ class NotesService{
     });
   }
 
+
   // for one item only
   Future<ApiResponse<Note>> getNote(String noteID) async {
     return http.get(API + '/notes/' + noteID, headers: Headers).
@@ -45,6 +50,22 @@ class NotesService{
       return ApiResponse<Note>(
           error: true, errorMessage: "An Error Is Occured");
     });
-
   }
+
+
+  Future<ApiResponse<bool>> createNote(InsertNote note) async {
+    return http.post(API + '/notes', headers: Headers,body: json.encode(note.toJson())).
+    then((data) {
+      if (data.statusCode == 201) {
+        return ApiResponse<bool>(data: true);
+      }
+      return ApiResponse<bool>(
+          error: true, errorMessage: "An Error Is Occured");
+    }).catchError((_) {
+      return ApiResponse<bool>(
+          error: true, errorMessage: "An Error Is Occured");
+    });
+  }
+
+
 }
