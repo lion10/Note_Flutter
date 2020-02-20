@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 import 'package:note_app/models/api_response.dart';
-import 'package:note_app/models/insert_note.dart';
+import 'package:note_app/models/manipultation_note.dart';
 import 'package:note_app/models/note.dart';
 import 'package:note_app/models/note_for_listing.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +15,10 @@ class NotesService{
     "Content-Type" :"application/json"
   };
 
+  // status code
+  // 200 get from api
+  // 201 insert new things to api (add)
+  // 204 update on things that had already created in api
 
   // for list of items
   Future<ApiResponse<List<NoteForListing>>> getNoteList() async{
@@ -52,8 +56,8 @@ class NotesService{
     });
   }
 
-
-  Future<ApiResponse<bool>> createNote(InsertNote note) async {
+ // create new note
+  Future<ApiResponse<bool>> createNote(ManipulationNote note) async {
     return http.post(API + '/notes', headers: Headers,body: json.encode(note.toJson())).
     then((data) {
       if (data.statusCode == 201) {
@@ -67,5 +71,34 @@ class NotesService{
     });
   }
 
+ // update on note
+  Future<ApiResponse<bool>> updateNote(ManipulationNote note ,String noteID) async {
+    return http.put(API + '/notes/'+ noteID, headers: Headers,body: json.encode(note.toJson())).
+    then((data) {
+      if (data.statusCode == 204) {
+        return ApiResponse<bool>(data: true);
+      }
+      return ApiResponse<bool>(
+          error: true, errorMessage: "An Error Is Occured");
+    }).catchError((_) {
+      return ApiResponse<bool>(
+          error: true, errorMessage: "An Error Is Occured");
+    });
+  }
+
+  // delete from api
+  Future<ApiResponse<bool>> deleteNote(String noteID) async {
+    return http.delete(API + '/notes/'+ noteID, headers: Headers).
+    then((data) {
+      if (data.statusCode == 204) {
+        return ApiResponse<bool>(data: true);
+      }
+      return ApiResponse<bool>(
+          error: true, errorMessage: "An Error Is Occured");
+    }).catchError((_) {
+      return ApiResponse<bool>(
+          error: true, errorMessage: "An Error Is Occured");
+    });
+  }
 
 }

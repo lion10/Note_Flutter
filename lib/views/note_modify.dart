@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:note_app/Service/notes_service.dart';
-import 'package:note_app/models/insert_note.dart';
+import 'package:note_app/models/manipultation_note.dart';
 import 'package:note_app/models/note.dart';
 
 class NoteModify extends StatefulWidget {
@@ -88,14 +88,50 @@ class _NoteModifyState extends State<NoteModify> {
                 onPressed: () async {
                   if(isEditing){
                    // update
-                  }else{
+                    setState(() {
+                      isLoading = true;
+                    });
+                    final note = ManipulationNote(
+                        noteTitle: titleController.text,
+                        noteContent:contentController.text
+                    );
 
+                    final result = await noteService.updateNote(note ,widget.noteID);
+                    setState(() {
+                      isLoading = false;
+                    });
+
+                    final title = "Done!" ;
+                    final text = result.error ? (result.errorMessage ?? "An error is occured") : "Note Was Updated";
+
+                    showDialog (
+                        context: context,
+                        builder: (_) => AlertDialog (
+                          title: Text(title),
+                          content:Text(text),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("OK!"),
+                              onPressed:(){
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
+                        )
+                    ).then((data){
+                      if(result.data){
+                        Navigator.of(context).pop();
+                      }
+                    });
+
+                  }else{
+                    // create
                     setState(() {
                       isLoading = true;
                     });
 
                     // create and add note
-                    final note = InsertNote(
+                    final note = ManipulationNote(
                       noteTitle: titleController.text,
                       noteContent:contentController.text
                     );

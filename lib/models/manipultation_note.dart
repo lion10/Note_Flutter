@@ -1,10 +1,14 @@
 
-class InsertNote{
+import 'package:flutter/cupertino.dart';
+
+class ManipulationNote{
 
  String  noteTitle;
  String  noteContent;
 
- InsertNote({this.noteTitle ,this.noteContent});
+ ManipulationNote({
+   @required this.noteTitle ,
+   @required this.noteContent});
 
   Map<String ,dynamic> toJson() {
     return {
